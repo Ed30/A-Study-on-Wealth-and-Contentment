@@ -1,0 +1,24 @@
+:root {
+    --main-bg-color: #EEF2F9;
+
+    --orange-highlight-color: #E5844B;
+    --purple-highlight-color: #B059EA;
+    --blue-highlight-color: #3981EA;
+    --teal-highlight-color: #41EAC3;
+
+    --light-text-color: #616E80;
+    --dark-text-color: #37404E;
+
+}
+
+body {
+    background-color: var(--main-bg-color);
+}
+
+.section {
+    width: 50rem;
+}
+
+.dark {
+    color: var(--dark-text-color);
+}
