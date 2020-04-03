@@ -18,7 +18,7 @@ Promise.all([
     d3.csv("js/data/median-income.csv"),
 ]).then(function(data) {
 
-    buildVisualisation();
+    setupVisualisationSpace();
 
     let meanIncomeData = data[0];
     let medianIncomeData = data[1];
@@ -54,11 +54,12 @@ Promise.all([
     addBoroughsToDropdown();
     setupMeanMedianButtons();
 
-    createAxes();
+    createVisualisation();
     updateVisualisation();
 
 });
 
+// Add the list of boroughs to the dropdown menu
 function addBoroughsToDropdown() {
 
     d3.select("#boroughDropdownButton")
@@ -75,6 +76,7 @@ function addBoroughsToDropdown() {
     }
 }
 
+// A new borough was selected
 function boroughSelected(boroughItem) {
     let boroughName = $(boroughItem).text();
     d3.select("#boroughDropdownButton")
@@ -83,10 +85,10 @@ function boroughSelected(boroughItem) {
     selectedBorough = boroughs.filter(borough => {
         return borough.name === boroughName;
     })[0];
-
     updateVisualisation();
 }
 
+// Add onchange events for the mean and median buttons
 function setupMeanMedianButtons() {
     d3.select("#mean")
         .attr("onchange", "meanMedianSelected(this)");
@@ -95,12 +97,14 @@ function setupMeanMedianButtons() {
         .attr("onchange", "meanMedianSelected(this)");
 }
 
+// Selected a new mean/median option
 function meanMedianSelected(item) {
     selectedMode = $(item).attr("name");
     updateVisualisation();
 }
 
-function buildVisualisation() {
+// Create the visualisation space by setting up sizes
+function setupVisualisationSpace() {
     visualisation = d3.select("#income-visualisation")
         .append("svg")
         .attr("width", width + margins.left + margins.right)
@@ -110,16 +114,22 @@ function buildVisualisation() {
             "translate(" + margins.left + "," + margins.top + ")");
 }
 
-
-function createAxes() {
+// Creates and initialise visualisation to initial dummy data
+function createVisualisation() {
 
     let mode = selectedMode.toLocaleLowerCase();
     let salaries = selectedBorough[mode];
 
+    //Create (x, y) axes
     xAxis = d3.scaleLinear()
         .domain(d3.extent(years)) // TODO try without extent
         .range([0, width]);
 
+    yAxis = d3.scaleLinear()
+        .domain([0, maxSalary[mode]])
+        .range([height, 0]);
+
+    //Append axes
     visualisation.append("g")
         .attr("id", "x-axis")
         .attr("class", "axis")
@@ -128,10 +138,6 @@ function createAxes() {
             .ticks()
             .tickFormat(d3.format("d")));
 
-    yAxis = d3.scaleLinear()
-        .domain([0, maxSalary[mode]])
-        .range([height, 0]);
-
     visualisation.append("g")
         .attr("id", "y-axis")
         .attr("class", "axis")
@@ -139,11 +145,12 @@ function createAxes() {
             .ticks()
             .tickFormat(d3.format(".0s")));
 
-    var initialData = salaries.map(function (salary, i) {
+    //Initialise visualisation to dummy data, for initial animation
+    let initialData = salaries.map(function (salary, i) {
         return {year: years[i], salary: maxSalary[mode]/2}
     });
 
-
+    //Append vertical grid lines
     visualisation
     .append("g")
         .attr("class", "grid")
@@ -153,8 +160,7 @@ function createAxes() {
             .tickFormat("")
         );
 
-
-    //Append
+    //Append line showing the trend
     visualisation
         .append('g')
         .append("path")
@@ -166,6 +172,7 @@ function createAxes() {
         )
         .attr("id", "salary-line");
 
+    //Append circles in correspondence of data points
     visualisation
         .append("g")
         .selectAll("dot")
@@ -180,15 +187,8 @@ function createAxes() {
 
 }
 
-function verticalGridlines() {
-    return d3.axisBottom(xAxis)
-        .ticks(years.length)
-}
-
+// Update visualisation to show new data
 function updateVisualisation() {
-
-    console.log(selectedBorough);
-    console.log(selectedMode);
 
     let mode = selectedMode.toLocaleLowerCase();
     let salaries = selectedBorough[mode];
@@ -209,10 +209,6 @@ function updateVisualisation() {
         return {year: years[i], salary: salary}
     });
 
-    // colors = d3.scaleLinear()
-    //     .domain([0, maxSalary[mode]])
-    //     .range(['#FFFFFF', '#2D8BCF']);
-
 
     d3.select("#salary-line")
         .datum(data)
@@ -232,18 +228,11 @@ function updateVisualisation() {
         .attr("cx", function(d) { return xAxis(d.year) } )
         .attr("cy", function(d) { return yAxis(d.salary) } )
 
+}
 
 
-    // visualisation.append("path")
-    //     .datum(data)
-    //     .attr("fill", "#cce5df")
-    //     .attr("stroke", "#69b3a2")
-    //     .attr("stroke-width", 1.5)
-    //     .attr("d", d3.area()
-    //         .x(function(d) { return xAxis(d.year) })
-    //         .y0(yAxis(0))
-    //         .y1(function(d) { return yAxis(d.salary) })
-    //     );
-
-
+// Create vertical grid lines
+function verticalGridlines() {
+    return d3.axisBottom(xAxis)
+        .ticks(years.length)
 }
