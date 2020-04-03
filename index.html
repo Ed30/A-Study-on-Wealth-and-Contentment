@@ -19,36 +19,79 @@
 
 
 <body>
+
     <div class="container d-flex justify-content-center p-4">
 
         <div class="row">
-        <div class="col">
+            <div class="col">
 
 
-        <div class="card rounded-lg shadow section m-3">
-            <div class="card-body">
+                <div class="card rounded-lg shadow panel light-background m-3">
+                    <div class="card-body">
 
-                <h4 class="card-title dark">A Study on Wealth and Contentment</h4>
-                <h5 class="card-subtitle mb-2 text-muted ">Introduction</h5>
+                        <h4 class="card-title white-text">A Study on Wealth and Contentment</h4>
+                        <h5 class="card-subtitle mb-2 light-text ">Introduction</h5>
 
-                <p class="card-text dark">
-                    The following is a relatively small, local study on the relationaship between
-                    income and happiness. The analysis proposed here takes into consideration London boroughs only,
-                    showing the relation between income and general levels of happiness of people living in each borough.
-                </p>
+                        <p class="card-text light-text">
+                            The following is a relatively small, local study on the relationaship between
+                            income and happiness. The analysis proposed here takes into consideration London boroughs only,
+                            showing the relation between income and general levels of happiness of people living in each borough.
+                        </p>
 
-                <p class="card-text dark">
-                    The Bubble Chart visualisation below takes data from two separate datasets, each representing one of
-                    the metrics, and displays the correlation between those, for each borough.
-                </p>
+                        <p class="card-text light-text">
+                            The Bubble Chart visualisation below takes data from two separate datasets, each representing one of
+                            the metrics, and displays the correlation between those, for each borough.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card rounded-lg shadow panel light-background m-3">
+                    <h5 class="card-header light-text">Income variation by borough</h5>
+                    <div class="card-body">
+
+                        <div class="container">
+
+                            <div class="row">
+
+                                <div class="col dropdown">
+                                    <button class="btn btn-outline-primary dropdown-toggle shadow" id="boroughDropdownButton" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        Choose Borough
+                                    </button>
+                                    <div class="dropdown-menu" id="boroughDropdownMenu">
+                                        <!-- Dropdown items computed dynamically with JavaScript. -->
+                                    </div>
+                                </div>
+
+                                <div class="col-md-auto btn-group btn-group-toggle" data-toggle="buttons">
+                                    <label class="btn btn-secondary shadow active">
+                                        <input type="radio" name="Mean" id="mean" autocomplete="off" checked> £ Mean
+                                    </label>
+                                    <label class="btn btn-secondary shadow">
+                                        <input type="radio" name="Median" id="median" autocomplete="off"> £ Median
+                                    </label>
+                                </div>
+
+
+                            </div>
+
+                            <div class="row">
+
+                                <div class="col mt-3" id="income-visualisation">
+
+                                </div>
+
+                            </div>
+
+
+                        </div>
+
+
+
+
+                    </div>
+                </div>
+
             </div>
-        </div>
-
-        <div class="card rounded-lg shadow section m-3" id="visualisation">
-
-        </div>
-
-        </div>
         </div>
 
     </div>

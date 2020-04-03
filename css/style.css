@@ -1,24 +1,70 @@
 :root {
-    --main-bg-color: #EEF2F9;
 
-    --orange-highlight-color: #E5844B;
-    --purple-highlight-color: #B059EA;
-    --blue-highlight-color: #3981EA;
-    --teal-highlight-color: #41EAC3;
+    --text-white: #FFF;
+    --text-light: #DCDCDC;
+    --text-dark: #B8B8B8;
+    --text-darker: #505050;
 
-    --light-text-color: #616E80;
-    --dark-text-color: #37404E;
+    --highlight-purple: #B25AED;
+    --highlight-yellow: #EDC25F;
+    --highlight-blue: #558AED;
+    --highlight-candy: #ED4556;
+    --highlight-teal: #07EDB0;
 
+    --bg-light: #3C3C3C;
+    --bg-dark: #2D2D2D;
 }
 
 body {
-    background-color: var(--main-bg-color);
+    background-color: var(--bg-dark);
 }
 
-.section {
+.panel {
     width: 50rem;
 }
 
-.dark {
-    color: var(--dark-text-color);
+#boroughDropdownMenu {
+    height: 300px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+#salary-line {
+    stroke: var(--highlight-blue);
+    stroke-width: 4;
+    fill: none;
+}
+
+.dot {
+    fill: var(--highlight-blue);
+    stroke: var(--bg-light);
+    stroke-width: 2;
+}
+
+.axis {
+    color: var(--text-dark);
+}
+
+.grid {
+    color: var(--text-darker);
+}
+
+.white-text {
+    color: var(--text-white);
+}
+
+.light-text {
+    color: var(--text-light);
+}
+
+.dark-text {
+    color: var(--text-dark);
+}
+
+.light-background {
+    background-color: var(--bg-light);
+}
+
+.dark-background {
+    background-color: var(--bg-dark);
 }
