@@ -24,7 +24,7 @@ body {
     width: 50rem;
 }
 
-#boroughDropdownMenu {
+#borough-dropdown-menu {
     height: 300px;
     max-height: 300px;
     overflow-y: auto;

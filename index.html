@@ -7,6 +7,7 @@
     <title>Wealth and Contentment</title>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
@@ -14,6 +15,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="js/script.js"></script>
+    <script src="js/BubbleChart.js"></script>
 
 </head>
 
@@ -46,7 +48,7 @@
                 </div>
 
                 <div class="card rounded-lg shadow panel light-background m-3">
-                    <h5 class="card-header light-text">Income variation by borough</h5>
+                    <h5 class="card-header light-text">Income Variation by Borough</h5>
                     <div class="card-body">
 
                         <div class="container">
@@ -54,10 +56,10 @@
                             <div class="row">
 
                                 <div class="col dropdown">
-                                    <button class="btn btn-outline-primary dropdown-toggle shadow" id="boroughDropdownButton" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <button class="btn btn-outline-primary dropdown-toggle shadow" id="borough-dropdown-button" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         Choose Borough
                                     </button>
-                                    <div class="dropdown-menu" id="boroughDropdownMenu">
+                                    <div class="dropdown-menu" id="borough-dropdown-menu">
                                         <!-- Dropdown items computed dynamically with JavaScript. -->
                                     </div>
                                 </div>
@@ -71,17 +73,13 @@
                                     </label>
                                 </div>
 
-
                             </div>
 
                             <div class="row">
-
                                 <div class="col mt-3" id="income-visualisation">
-
+                                    <!-- Income visualisation computed dynamically with JavaScript. -->
                                 </div>
-
                             </div>
-
 
                         </div>
 
@@ -90,6 +88,59 @@
 
                     </div>
                 </div>
+
+
+
+
+
+
+                <div class="card rounded-lg shadow panel light-background m-3">
+                    <h5 class="card-header light-text">Relationship Between Income and Happiness</h5>
+                    <div class="card-body">
+
+                        <div class="container">
+
+                            <div class="row">
+
+                                <div class="col btn-toolbar" role="toolbar">
+                                    <div class="btn-group shadow mr-2" id="years-toolbar" role="group">
+                                        <!-- Year buttons computed dynamically with JavaScript. -->
+                                    </div>
+                                    <div class="btn-group shadow mr-2" role="group">
+                                        <button type="button" class="btn btn-outline-primary">
+                                            <i class="fas fa-play"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-auto btn-group btn-group-toggle" data-toggle="buttons">
+                                    <label class="btn btn-secondary shadow active">
+                                        <input type="radio" name="Mean" id="mean" autocomplete="off" checked> £ Mean
+                                    </label>
+                                    <label class="btn btn-secondary shadow">
+                                        <input type="radio" name="Median" id="median" autocomplete="off"> £ Median
+                                    </label>
+                                </div>
+
+                            </div>
+
+                            <div class="row">
+                                <div class="col mt-3" id="income-visualisation">
+                                    <!-- Income visualisation computed dynamically with JavaScript. -->
+                                </div>
+                            </div>
+
+                        </div>
+
+
+
+
+                    </div>
+                </div>
+
+
+
+
 
             </div>
         </div>

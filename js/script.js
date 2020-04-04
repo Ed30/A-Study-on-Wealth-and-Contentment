@@ -27,8 +27,8 @@ Promise.all([
     // Loop through the tables
     for (let i = 0; i<meanIncomeData.length; i++) {
 
-        let meanSalaries = [];
-        let medianSalaries = [];
+        let meanIncomes = [];
+        let medianIncomes = [];
 
         for (let year in meanIncomeData[i]) {
 
@@ -40,15 +40,15 @@ Promise.all([
             let medianIncome = parseInt(medianIncomeData[i][year].replace(",",""));
             //Discard non-numeric values
             if (!Number.isNaN(meanIncome)) {
-                meanSalaries.push(meanIncome);
+                meanIncomes.push(meanIncome);
                 maxIncome.mean = Math.max(maxIncome.mean, meanIncome);
             }
             if (!Number.isNaN(medianIncome)) {
-                medianSalaries.push(medianIncome);
+                medianIncomes.push(medianIncome);
                 maxIncome.median = Math.max(maxIncome.median, medianIncome);
             }
         }
-        let borough = {name: meanIncomeData[i].Area, mean: meanSalaries, median: medianSalaries};
+        let borough = {name: meanIncomeData[i].Area, mean: meanIncomes, median: medianIncomes};
         boroughs.push(borough);
     }
 
@@ -63,13 +63,13 @@ Promise.all([
 // Add the list of boroughs to the dropdown menu
 function addBoroughsToDropdown() {
 
-    d3.select("#boroughDropdownButton")
+    d3.select("#borough-dropdown-button")
         .text(boroughs[0].name);
 
     selectedBorough = boroughs[0];
 
     for (let i = 0; i<boroughs.length; i++) {
-        d3.select("#boroughDropdownMenu")
+        d3.select("#borough-dropdown-menu")
             .append("a")
             .attr("class", "dropdown-item")
             .attr("onclick", 'boroughSelected(this)')
@@ -119,7 +119,7 @@ function setupVisualisationSpace() {
 function createVisualisation() {
 
     let mode = selectedMode.toLocaleLowerCase();
-    let salaries = selectedBorough[mode];
+    let incomes = selectedBorough[mode];
 
     //Create (x, y) axes
     xAxis = d3.scaleLinear()
@@ -149,7 +149,7 @@ function createVisualisation() {
             }));
 
     //Initialise visualisation to dummy data, for initial animation
-    let initialData = salaries.map(function (income, i) {
+    let initialData = incomes.map(function (income, i) {
         return {year: years[i], income: maxIncome[mode]/2}
     });
 
@@ -232,7 +232,7 @@ function createVisualisation() {
 function updateVisualisation() {
 
     let mode = selectedMode.toLocaleLowerCase();
-    let salaries = selectedBorough[mode];
+    let incomes = selectedBorough[mode];
     updatingVisualisation = true;
 
     // Update y axis values if a new mode was selected
@@ -251,12 +251,12 @@ function updateVisualisation() {
                 return d === 0 ? "" : "£" + d3.format(".2s")(d);
             }));
 
-    // Map new salaries array to the years
-    var data = salaries.map(function (income, i) {
+    // Map new incomes array to the years
+    var data = incomes.map(function (income, i) {
         return {year: years[i], income: income}
     });
 
-
+    // Update income line
     d3.select("#income-line")
         .datum(data)
         .transition()
@@ -268,7 +268,6 @@ function updateVisualisation() {
             .curve(d3.curveMonotoneX)
         );
 
-
     //Update data point positions
     d3.selectAll(".dot")
         .data(data)
@@ -278,11 +277,11 @@ function updateVisualisation() {
         .attr("cx", function(d) { return xAxis(d.year) } )
         .attr("cy", function(d) { return yAxis(d.income) } );
 
-    // Update data outside of transition!
+    // Update tooltip title outside of transition!
     d3.selectAll(".dot")
         .attr("data-original-title", function (d) { return "£" + d3.format(",.0f")(d.income) + " in " + d.year});
 
-    // Update area
+    // Update gradient area
     d3.select("#gradient-area")
         .datum(data)
         .transition()
@@ -300,16 +299,16 @@ function updateVisualisation() {
 
 }
 
-
 // Create vertical grid lines
 function verticalGridlines() {
     return d3.axisBottom(xAxis)
         .ticks(years.length)
 }
 
+// Mouse entered the data point area
 function mouseOverDataPoint(data, dataPoint) {
 
-    // Apply mouseover transition if previous transition has finished
+    // Apply transition if previous transition has finished
     if (!updatingVisualisation) {
         dataPoint
             .transition()
@@ -319,9 +318,9 @@ function mouseOverDataPoint(data, dataPoint) {
             .style('stroke-width', '0px')
             .style("fill", "var(--highlight-orange)");
     }
-
 }
 
+// Mouse pointer left the data point area
 function mouseOutDataPoint(dataPoint) {
 
     if (!updatingVisualisation) {
