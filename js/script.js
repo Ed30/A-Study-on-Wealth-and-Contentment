@@ -4,7 +4,7 @@ var boroughs = [],
     selectedMode = "Mean",
     maxSalary = {mean: 0, median: 0};
 
-var margins = { top: 10, right: 10, bottom: 30, left: 32 },
+var margins = { top: 10, right: 10, bottom: 30, left: 38 },
     height = 400 - margins.top - margins.bottom,
     width = 720 - margins.left - margins.right,
     xAxis = null,
@@ -142,8 +142,10 @@ function createVisualisation() {
         .attr("id", "y-axis")
         .attr("class", "axis")
         .call(d3.axisLeft(yAxis)
-            .ticks()
-            .tickFormat(d3.format(".0s")));
+            .ticks(12)
+            .tickFormat(function (d) {
+                return d === 0 ? "" : "£" + d3.format(".2s")(d);
+            }));
 
     //Initialise visualisation to dummy data, for initial animation
     let initialData = salaries.map(function (salary, i) {
@@ -160,6 +162,34 @@ function createVisualisation() {
             .tickFormat("")
         );
 
+    // Define gradient object to be used later
+    let gradient = visualisation.append("defs")
+        .append("linearGradient")
+        .attr("id","gradient")
+        .attr("x1", "0%").attr("y1", "0%")
+        .attr("x2", "0%").attr("y2", "100%");
+
+    gradient.append("stop")
+        .attr("offset", "0%")
+        .attr("stop-color", "var(--highlight-blue)")
+        .attr("stop-opacity", 0.5);
+
+    gradient.append("stop")
+        .attr("offset", "100%")
+        .attr("stop-color", "white)")
+        .attr("stop-opacity", 0);
+
+    // Compute and append area. Use gradient created above as fill
+    visualisation.append("path")
+        .attr("id", "gradient-area")
+        .datum(initialData)
+        .style("fill", "url(#gradient)")
+        .attr("d", d3.area()
+            .x(function(d) { return xAxis(d.year) })
+            .y0(yAxis(0))
+            .y1(function(d) { return yAxis(d.salary) })
+        );
+
     //Append line showing the trend
     visualisation
         .append('g')
@@ -172,7 +202,7 @@ function createVisualisation() {
         )
         .attr("id", "salary-line");
 
-    //Append circles in correspondence of data points
+    //Append dots in correspondence of data points
     visualisation
         .append("g")
         .selectAll("dot")
@@ -182,7 +212,19 @@ function createVisualisation() {
         .attr("class", "dot")
         .attr("cx", function(d) { return xAxis(d.year) } )
         .attr("cy", function(d) { return yAxis(d.salary) } )
-        .attr("r", 5)
+        .attr("r", 7)
+        .attr("data-toggle", "tooltip")
+        .attr("data-placement", "top")
+        .attr("title", function (d) { return d.salary })
+        .on("mouseover", function (d) {
+            mouseOverDataPoint(d, d3.select(this))
+        })
+        .on("mouseout", function () {
+            mouseOutDataPoint(d3.select(this))
+        });
+
+    // Refresh tooltips
+    $('[data-toggle="tooltip"]').tooltip();
 
 
 }
@@ -193,18 +235,23 @@ function updateVisualisation() {
     let mode = selectedMode.toLocaleLowerCase();
     let salaries = selectedBorough[mode];
 
+    // Update y axis values if a new mode was selected
     yAxis = d3.scaleLinear()
         .domain([0, maxSalary[mode]])
         .range([height, 0]);
 
     visualisation.select("#y-axis")
         .transition()
-        .ease(d3.easeCubic)
+        .ease(d3.easeExpOut)
         .duration(1000)
         .call(d3.axisLeft(yAxis)
-            .ticks()
-            .tickFormat(d3.format(".0s")));
+            .ticks(12)
+            .tickFormat(function (d) {
+                // Include £ prefix and avoid showing £0 value
+                return d === 0 ? "" : "£" + d3.format(".2s")(d);
+            }));
 
+    // Map new salaries array to the years
     var data = salaries.map(function (salary, i) {
         return {year: years[i], salary: salary}
     });
@@ -213,6 +260,7 @@ function updateVisualisation() {
     d3.select("#salary-line")
         .datum(data)
         .transition()
+        .ease(d3.easeExpOut)
         .duration(1000)
         .attr("d", d3.line()
             .x(function(d) { return xAxis(d.year) })
@@ -224,9 +272,23 @@ function updateVisualisation() {
     d3.selectAll(".dot")
         .data(data)
         .transition()
+        .ease(d3.easeExpOut)
         .duration(1000)
         .attr("cx", function(d) { return xAxis(d.year) } )
         .attr("cy", function(d) { return yAxis(d.salary) } )
+        .attr("title", function (d) { return d.salary });
+
+    d3.select("#gradient-area")
+        .datum(data)
+        .transition()
+        .ease(d3.easeExpOut)
+        .duration(1000)
+        .attr("d", d3.area()
+            .x(function(d) { return xAxis(d.year) })
+            .y0(yAxis(0))
+            .y1(function(d) { return yAxis(d.salary) })
+            .curve(d3.curveMonotoneX)
+        );
 
 }
 
@@ -235,4 +297,28 @@ function updateVisualisation() {
 function verticalGridlines() {
     return d3.axisBottom(xAxis)
         .ticks(years.length)
+}
+
+function mouseOverDataPoint(data, dataPoint) {
+
+    dataPoint
+        .transition()
+        .ease(d3.easeCubicOut)
+        .duration(200)
+        .attr("r", 8)
+        .style('stroke-width', '0px')
+        .style("fill", "var(--highlight-orange)");
+
+    console.log(data);
+}
+
+function mouseOutDataPoint(dataPoint) {
+
+    dataPoint
+        .transition()
+        .ease(d3.easeCubicOut)
+        .duration(200)
+        .attr("r", 7)
+        .style('stroke-width', '3px')
+        .style("fill", "var(--highlight-blue)");
 }

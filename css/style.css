@@ -5,11 +5,12 @@
     --text-dark: #B8B8B8;
     --text-darker: #505050;
 
-    --highlight-purple: #B25AED;
-    --highlight-yellow: #EDC25F;
-    --highlight-blue: #558AED;
-    --highlight-candy: #ED4556;
-    --highlight-teal: #07EDB0;
+    --highlight-blue: #007BFF;
+    --highlight-purple: #7E57C2;
+    --highlight-red: #f44336;
+    --highlight-orange: #ff8a65;
+    --highlight-yellow: #FFCA28;
+    --highlight-green: #4caf50;
 
     --bg-light: #3C3C3C;
     --bg-dark: #2D2D2D;
@@ -31,14 +32,14 @@ body {
 
 #salary-line {
     stroke: var(--highlight-blue);
-    stroke-width: 4;
+    stroke-width: 5;
     fill: none;
 }
 
 .dot {
     fill: var(--highlight-blue);
     stroke: var(--bg-light);
-    stroke-width: 2;
+    stroke-width: 3;
 }
 
 .axis {
