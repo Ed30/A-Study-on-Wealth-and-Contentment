@@ -2,7 +2,7 @@ var boroughs = [],
     years = [],
     selectedBorough = "",
     selectedMode = "Mean",
-    maxSalary = {mean: 0, median: 0};
+    maxIncome = {mean: 0, median: 0};
 
 var margins = { top: 10, right: 10, bottom: 30, left: 38 },
     height = 400 - margins.top - margins.bottom,
@@ -11,6 +11,7 @@ var margins = { top: 10, right: 10, bottom: 30, left: 38 },
     yAxis = null;
 
 var visualisation = null;
+var updatingVisualisation = false;
 
 // Read income tables
 Promise.all([
@@ -35,16 +36,16 @@ Promise.all([
                 years.push(year);
             }
 
-            let meanSalary = parseInt(meanIncomeData[i][year].replace(",",""));
-            let medianSalary = parseInt(medianIncomeData[i][year].replace(",",""));
+            let meanIncome = parseInt(meanIncomeData[i][year].replace(",",""));
+            let medianIncome = parseInt(medianIncomeData[i][year].replace(",",""));
             //Discard non-numeric values
-            if (!Number.isNaN(meanSalary)) {
-                meanSalaries.push(meanSalary);
-                maxSalary.mean = Math.max(maxSalary.mean, meanSalary);
+            if (!Number.isNaN(meanIncome)) {
+                meanSalaries.push(meanIncome);
+                maxIncome.mean = Math.max(maxIncome.mean, meanIncome);
             }
-            if (!Number.isNaN(medianSalary)) {
-                medianSalaries.push(medianSalary);
-                maxSalary.median = Math.max(maxSalary.median, medianSalary);
+            if (!Number.isNaN(medianIncome)) {
+                medianSalaries.push(medianIncome);
+                maxIncome.median = Math.max(maxIncome.median, medianIncome);
             }
         }
         let borough = {name: meanIncomeData[i].Area, mean: meanSalaries, median: medianSalaries};
@@ -126,7 +127,7 @@ function createVisualisation() {
         .range([0, width]);
 
     yAxis = d3.scaleLinear()
-        .domain([0, maxSalary[mode]])
+        .domain([0, maxIncome[mode]])
         .range([height, 0]);
 
     //Append axes
@@ -148,8 +149,8 @@ function createVisualisation() {
             }));
 
     //Initialise visualisation to dummy data, for initial animation
-    let initialData = salaries.map(function (salary, i) {
-        return {year: years[i], salary: maxSalary[mode]/2}
+    let initialData = salaries.map(function (income, i) {
+        return {year: years[i], income: maxIncome[mode]/2}
     });
 
     //Append vertical grid lines
@@ -187,7 +188,7 @@ function createVisualisation() {
         .attr("d", d3.area()
             .x(function(d) { return xAxis(d.year) })
             .y0(yAxis(0))
-            .y1(function(d) { return yAxis(d.salary) })
+            .y1(function(d) { return yAxis(d.income) })
         );
 
     //Append line showing the trend
@@ -197,10 +198,10 @@ function createVisualisation() {
         .datum(initialData)
         .attr("d", d3.line()
             .x(function(d) { return xAxis(d.year) })
-            .y(function(d) { return yAxis(d.salary) })
+            .y(function(d) { return yAxis(d.income) })
             .curve(d3.curveMonotoneX)
         )
-        .attr("id", "salary-line");
+        .attr("id", "income-line");
 
     //Append dots in correspondence of data points
     visualisation
@@ -211,11 +212,11 @@ function createVisualisation() {
         .append("circle")
         .attr("class", "dot")
         .attr("cx", function(d) { return xAxis(d.year) } )
-        .attr("cy", function(d) { return yAxis(d.salary) } )
+        .attr("cy", function(d) { return yAxis(d.income) } )
         .attr("r", 7)
         .attr("data-toggle", "tooltip")
         .attr("data-placement", "top")
-        .attr("title", function (d) { return d.salary })
+        .attr("data-original-title", function (d) { return d.income })
         .on("mouseover", function (d) {
             mouseOverDataPoint(d, d3.select(this))
         })
@@ -223,9 +224,7 @@ function createVisualisation() {
             mouseOutDataPoint(d3.select(this))
         });
 
-    // Refresh tooltips
     $('[data-toggle="tooltip"]').tooltip();
-
 
 }
 
@@ -234,10 +233,11 @@ function updateVisualisation() {
 
     let mode = selectedMode.toLocaleLowerCase();
     let salaries = selectedBorough[mode];
+    updatingVisualisation = true;
 
     // Update y axis values if a new mode was selected
     yAxis = d3.scaleLinear()
-        .domain([0, maxSalary[mode]])
+        .domain([0, maxIncome[mode]])
         .range([height, 0]);
 
     visualisation.select("#y-axis")
@@ -252,32 +252,37 @@ function updateVisualisation() {
             }));
 
     // Map new salaries array to the years
-    var data = salaries.map(function (salary, i) {
-        return {year: years[i], salary: salary}
+    var data = salaries.map(function (income, i) {
+        return {year: years[i], income: income}
     });
 
 
-    d3.select("#salary-line")
+    d3.select("#income-line")
         .datum(data)
         .transition()
         .ease(d3.easeExpOut)
         .duration(1000)
         .attr("d", d3.line()
             .x(function(d) { return xAxis(d.year) })
-            .y(function(d) { return yAxis(d.salary) })
+            .y(function(d) { return yAxis(d.income) })
             .curve(d3.curveMonotoneX)
         );
 
 
+    //Update data point positions
     d3.selectAll(".dot")
         .data(data)
         .transition()
         .ease(d3.easeExpOut)
         .duration(1000)
         .attr("cx", function(d) { return xAxis(d.year) } )
-        .attr("cy", function(d) { return yAxis(d.salary) } )
-        .attr("title", function (d) { return d.salary });
+        .attr("cy", function(d) { return yAxis(d.income) } );
 
+    // Update data outside of transition!
+    d3.selectAll(".dot")
+        .attr("data-original-title", function (d) { return "£" + d3.format(",.0f")(d.income) + " in " + d.year});
+
+    // Update area
     d3.select("#gradient-area")
         .datum(data)
         .transition()
@@ -286,9 +291,12 @@ function updateVisualisation() {
         .attr("d", d3.area()
             .x(function(d) { return xAxis(d.year) })
             .y0(yAxis(0))
-            .y1(function(d) { return yAxis(d.salary) })
+            .y1(function(d) { return yAxis(d.income) })
             .curve(d3.curveMonotoneX)
-        );
+        )
+        .on("end", function () {
+            updatingVisualisation = false;
+        });
 
 }
 
@@ -301,24 +309,28 @@ function verticalGridlines() {
 
 function mouseOverDataPoint(data, dataPoint) {
 
-    dataPoint
-        .transition()
-        .ease(d3.easeCubicOut)
-        .duration(200)
-        .attr("r", 8)
-        .style('stroke-width', '0px')
-        .style("fill", "var(--highlight-orange)");
+    // Apply mouseover transition if previous transition has finished
+    if (!updatingVisualisation) {
+        dataPoint
+            .transition()
+            .ease(d3.easeElastic)
+            .duration(800)
+            .attr("r", 8)
+            .style('stroke-width', '0px')
+            .style("fill", "var(--highlight-orange)");
+    }
 
-    console.log(data);
 }
 
 function mouseOutDataPoint(dataPoint) {
 
-    dataPoint
-        .transition()
-        .ease(d3.easeCubicOut)
-        .duration(200)
-        .attr("r", 7)
-        .style('stroke-width', '3px')
-        .style("fill", "var(--highlight-blue)");
+    if (!updatingVisualisation) {
+        dataPoint
+            .transition()
+            .ease(d3.easeElastic)
+            .duration(800)
+            .attr("r", 7)
+            .style('stroke-width', '3px')
+            .style("fill", "var(--highlight-blue)");
+    }
 }

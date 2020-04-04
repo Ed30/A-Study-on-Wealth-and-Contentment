@@ -8,7 +8,7 @@
     --highlight-blue: #007BFF;
     --highlight-purple: #7E57C2;
     --highlight-red: #f44336;
-    --highlight-orange: #ff8a65;
+    --highlight-orange: #F59A52;
     --highlight-yellow: #FFCA28;
     --highlight-green: #4caf50;
 
@@ -30,7 +30,7 @@ body {
     overflow-y: auto;
 }
 
-#salary-line {
+#income-line {
     stroke: var(--highlight-blue);
     stroke-width: 5;
     fill: none;
