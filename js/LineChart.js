@@ -1,11 +1,9 @@
 
 let lineChart = {
 
-    boroughs : [],
     years : [],
-    selectedBorough : "",
+    selectedBorough : null,
     selectedMode : "Mean",
-    maxIncome : {mean: 0, median: 0},
 
     margins : { top: 10, right: 10, bottom: 30, left: 38 },
     height : 0,
@@ -30,32 +28,29 @@ Promise.all([
     let meanIncomeData = data[0];
     let medianIncomeData = data[1];
 
+    lineChart.years = Object.keys(meanIncomeData[0]);
+    lineChart.years.splice(-2); //Remove "area" and "code"
+
     // Loop through the tables
     for (let i = 0; i<meanIncomeData.length; i++) {
 
         let meanIncomes = [];
         let medianIncomes = [];
 
-        for (let year in meanIncomeData[i]) {
-
-            if (i === 0 && !isNaN(year)) {
-                lineChart.years.push(year);
-            }
+        for (const year of lineChart.years) {
 
             let meanIncome = parseInt(meanIncomeData[i][year].replace(",",""));
             let medianIncome = parseInt(medianIncomeData[i][year].replace(",",""));
-            //Discard non-numeric values
-            if (!Number.isNaN(meanIncome)) {
-                meanIncomes.push(meanIncome);
-                lineChart.maxIncome.mean = Math.max(lineChart.maxIncome.mean, meanIncome);
-            }
-            if (!Number.isNaN(medianIncome)) {
-                medianIncomes.push(medianIncome);
-                lineChart.maxIncome.median = Math.max(lineChart.maxIncome.median, medianIncome);
-            }
+
+            meanIncomes.push(meanIncome);
+            common.maxIncome.mean = Math.max(common.maxIncome.mean, meanIncome);
+
+            medianIncomes.push(medianIncome);
+            common.maxIncome.median = Math.max(common.maxIncome.median, medianIncome);
+
         }
         let borough = {name: meanIncomeData[i].Area, mean: meanIncomes, median: medianIncomes};
-        lineChart.boroughs.push(borough);
+        common.boroughs.push(borough);
     }
 
     addBoroughsToLineChartDropdown();
@@ -70,16 +65,16 @@ Promise.all([
 function addBoroughsToLineChartDropdown() {
 
     d3.select("#borough-dropdown-button")
-        .text(lineChart.boroughs[0].name);
+        .text(common.boroughs[0].name);
 
-    lineChart.selectedBorough = lineChart.boroughs[0];
+    lineChart.selectedBorough = common.boroughs[0];
 
-    for (let i = 0; i<lineChart.boroughs.length; i++) {
+    for (let i = 0; i<common.boroughs.length; i++) {
         d3.select("#borough-dropdown-menu")
             .append("a")
             .attr("class", "dropdown-item")
             .attr("onclick", 'boroughSelected(this)')
-            .text(lineChart.boroughs[i].name)
+            .text(common.boroughs[i].name)
     }
 }
 
@@ -89,7 +84,7 @@ function boroughSelected(boroughItem) {
     d3.select("#boroughDropdownButton")
         .text(boroughName);
 
-    lineChart.selectedBorough = lineChart.boroughs.filter(borough => {
+    lineChart.selectedBorough = common.boroughs.filter(borough => {
         return borough.name === boroughName;
     })[0];
     updateLineChartVisualisation();
@@ -123,7 +118,7 @@ function createLineChartVisualisation() {
         .range([0, lineChart.width]);
 
     lineChart.yAxis = d3.scaleLinear()
-        .domain([0, lineChart.maxIncome[mode]])
+        .domain([0, common.maxIncome[mode]])
         .range([lineChart.height, 0]);
 
     //Append axes
@@ -146,7 +141,7 @@ function createLineChartVisualisation() {
 
     //Initialise visualisation to dummy data, for initial animation
     let initialData = incomes.map(function (income, i) {
-        return {year: lineChart.years[i], income: lineChart.maxIncome[mode]/2}
+        return {year: lineChart.years[i], income: common.maxIncome[mode]/2}
     });
 
     //Append vertical grid lines
@@ -233,7 +228,7 @@ function updateLineChartVisualisation() {
 
     // Update y axis values if a new mode was selected
     lineChart.yAxis = d3.scaleLinear()
-        .domain([0, lineChart.maxIncome[mode]])
+        .domain([0, common.maxIncome[mode]])
         .range([lineChart.height, 0]);
 
     lineChart.visualisation.select("#y-axis")

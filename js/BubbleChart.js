@@ -5,6 +5,10 @@ let bubbleChart = {
     years : [],
     selectedYear : "",
 
+    maxNumberOfPeople : 0,
+    minHappiness : Number.MAX_SAFE_INTEGER,
+    maxHappiness :0,
+
     margins : { top: 10, right: 10, bottom: 30, left: 38 },
     height : 0,
     width : 0,
@@ -26,23 +30,45 @@ Promise.all([
     setupChartSpace(bubbleChart, "#income-happiness-visualisation", 400, 720);
 
     let meanIncomeData = data[0];
-    let meanHappinessData = data[1]; // Years 2012 through 2017 only
+    let meanHappinessData = data[1]; // Contains years 2012 through 2017 only
     let numberOfIndividualsData = data[2];
+
+    bubbleChart.years = Object.keys(meanHappinessData[0]);
+    bubbleChart.years.splice(-2); //Remove "area" and "code"
 
     for (let i = 0; i<meanHappinessData.length; i++) {
 
-        let meanIncomes = [];
-        let meanHappiness = [];
+        let numberOfPeopleValues = [];
+        let meanHappinessValues = [];
 
-        for (let year in meanHappinessData[i]) {
+        for (const year of bubbleChart.years) {
 
-            if (i === 0 && !isNaN(year)) {
-                bubbleChart.years.push(year);
+            let numberOfPeople = parseInt(numberOfIndividualsData[i][year].replace(",",""));
+            let meanHappiness = parseFloat(meanHappinessData[i][year]);
+
+            numberOfPeopleValues.push(numberOfPeople);
+            bubbleChart.maxNumberOfPeople = Math.max(bubbleChart.maxNumberOfPeople, numberOfPeople);
+
+            meanHappinessValues.push(meanHappiness);
+
+            if (!isNaN(meanHappiness)) {
+                bubbleChart.maxHappiness = Math.max(bubbleChart.maxHappiness, meanHappiness);
+                bubbleChart.minHappiness = Math.min(bubbleChart.minHappiness, meanHappiness);
             }
+
+
+
+
         }
+
+        common.boroughs[i].numberOfPeople = numberOfPeopleValues;
+        common.boroughs[i].meanHappiness = meanHappinessValues;
 
     }
 
+    console.log(bubbleChart.minHappiness);
+    console.log(bubbleChart.maxHappiness);
+    console.log(bubbleChart.maxNumberOfPeople);
     addYearsToBubbleChartToolbar();
 
 });
@@ -75,12 +101,18 @@ function yearSelected(item) {
     d3.select(item)
         .classed("active", true);
 
-    let previousYear = selectedYear;
+    let previousYear = bubbleChart.selectedYear;
     bubbleChart.selectedYear = $(item).attr("name");
 
     if (bubbleChart.selectedYear !== previousYear) {
         updateBubbleChartVisualisation();
     }
+
+
+}
+
+function createBubbleChartVisualisation() {
+
 
 
 }
