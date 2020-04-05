@@ -40,6 +40,7 @@ body {
     fill: var(--highlight-blue);
     stroke: var(--bg-light);
     stroke-width: 3;
+
 }
 
 .axis {
