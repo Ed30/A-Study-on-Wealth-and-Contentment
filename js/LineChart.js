@@ -1,17 +1,23 @@
-var boroughs = [],
-    years = [],
-    selectedBorough = "",
-    selectedMode = "Mean",
-    maxIncome = {mean: 0, median: 0};
 
-var margins = { top: 10, right: 10, bottom: 30, left: 38 },
-    height = 400 - margins.top - margins.bottom,
-    width = 720 - margins.left - margins.right,
-    xAxis = null,
-    yAxis = null;
+let lineChart = {
 
-var visualisation = null;
-var updatingVisualisation = false;
+    boroughs : [],
+    years : [],
+    selectedBorough : "",
+    selectedMode : "Mean",
+    maxIncome : {mean: 0, median: 0},
+
+    margins : { top: 10, right: 10, bottom: 30, left: 38 },
+    height : 0,
+    width : 0,
+    xAxis : null,
+    yAxis : null,
+
+    visualisation : null,
+    updatingVisualisation : false
+
+};
+
 
 // Read income tables
 Promise.all([
@@ -19,7 +25,7 @@ Promise.all([
     d3.csv("js/data/median-income.csv"),
 ]).then(function(data) {
 
-    setupVisualisationSpace();
+    setupChartSpace(lineChart, "#income-visualisation", 400, 720);
 
     let meanIncomeData = data[0];
     let medianIncomeData = data[1];
@@ -33,7 +39,7 @@ Promise.all([
         for (let year in meanIncomeData[i]) {
 
             if (i === 0 && !isNaN(year)) {
-                years.push(year);
+                lineChart.years.push(year);
             }
 
             let meanIncome = parseInt(meanIncomeData[i][year].replace(",",""));
@@ -41,39 +47,39 @@ Promise.all([
             //Discard non-numeric values
             if (!Number.isNaN(meanIncome)) {
                 meanIncomes.push(meanIncome);
-                maxIncome.mean = Math.max(maxIncome.mean, meanIncome);
+                lineChart.maxIncome.mean = Math.max(lineChart.maxIncome.mean, meanIncome);
             }
             if (!Number.isNaN(medianIncome)) {
                 medianIncomes.push(medianIncome);
-                maxIncome.median = Math.max(maxIncome.median, medianIncome);
+                lineChart.maxIncome.median = Math.max(lineChart.maxIncome.median, medianIncome);
             }
         }
         let borough = {name: meanIncomeData[i].Area, mean: meanIncomes, median: medianIncomes};
-        boroughs.push(borough);
+        lineChart.boroughs.push(borough);
     }
 
-    addBoroughsToDropdown();
-    setupMeanMedianButtons();
+    addBoroughsToLineChartDropdown();
+    setupLineChartMeanMedianButtons();
 
-    createVisualisation();
-    updateVisualisation();
+    createLineChartVisualisation();
+    updateLineChartVisualisation();
 
 });
 
 // Add the list of boroughs to the dropdown menu
-function addBoroughsToDropdown() {
+function addBoroughsToLineChartDropdown() {
 
     d3.select("#borough-dropdown-button")
-        .text(boroughs[0].name);
+        .text(lineChart.boroughs[0].name);
 
-    selectedBorough = boroughs[0];
+    lineChart.selectedBorough = lineChart.boroughs[0];
 
-    for (let i = 0; i<boroughs.length; i++) {
+    for (let i = 0; i<lineChart.boroughs.length; i++) {
         d3.select("#borough-dropdown-menu")
             .append("a")
             .attr("class", "dropdown-item")
             .attr("onclick", 'boroughSelected(this)')
-            .text(boroughs[i].name)
+            .text(lineChart.boroughs[i].name)
     }
 }
 
@@ -83,14 +89,14 @@ function boroughSelected(boroughItem) {
     d3.select("#boroughDropdownButton")
         .text(boroughName);
 
-    selectedBorough = boroughs.filter(borough => {
+    lineChart.selectedBorough = lineChart.boroughs.filter(borough => {
         return borough.name === boroughName;
     })[0];
-    updateVisualisation();
+    updateLineChartVisualisation();
 }
 
 // Add onchange events for the mean and median buttons
-function setupMeanMedianButtons() {
+function setupLineChartMeanMedianButtons() {
     d3.select("#mean")
         .attr("onchange", "meanMedianSelected(this)");
 
@@ -100,49 +106,39 @@ function setupMeanMedianButtons() {
 
 // Selected a new mean/median option
 function meanMedianSelected(item) {
-    selectedMode = $(item).attr("name");
-    updateVisualisation();
+    lineChart.selectedMode = $(item).attr("name");
+    updateLineChartVisualisation();
 }
 
-// Create the visualisation space by setting up sizes
-function setupVisualisationSpace() {
-    visualisation = d3.select("#income-visualisation")
-        .append("svg")
-        .attr("width", width + margins.left + margins.right)
-        .attr("height", height + margins.top + margins.bottom)
-        .append("g")
-        .attr("transform",
-            "translate(" + margins.left + "," + margins.top + ")");
-}
 
 // Creates and initialise visualisation to initial dummy data
-function createVisualisation() {
+function createLineChartVisualisation() {
 
-    let mode = selectedMode.toLocaleLowerCase();
-    let incomes = selectedBorough[mode];
+    let mode = lineChart.selectedMode.toLocaleLowerCase();
+    let incomes = lineChart.selectedBorough[mode];
 
     //Create (x, y) axes
-    xAxis = d3.scaleLinear()
-        .domain(d3.extent(years)) // TODO try without extent
-        .range([0, width]);
+    lineChart.xAxis = d3.scaleLinear()
+        .domain(d3.extent(lineChart.years))
+        .range([0, lineChart.width]);
 
-    yAxis = d3.scaleLinear()
-        .domain([0, maxIncome[mode]])
-        .range([height, 0]);
+    lineChart.yAxis = d3.scaleLinear()
+        .domain([0, lineChart.maxIncome[mode]])
+        .range([lineChart.height, 0]);
 
     //Append axes
-    visualisation.append("g")
+    lineChart.visualisation.append("g")
         .attr("id", "x-axis")
         .attr("class", "axis")
-        .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(xAxis)
+        .attr("transform", "translate(0," + lineChart.height + ")")
+        .call(d3.axisBottom(lineChart.xAxis)
             .ticks()
             .tickFormat(d3.format("d")));
 
-    visualisation.append("g")
+    lineChart.visualisation.append("g")
         .attr("id", "y-axis")
         .attr("class", "axis")
-        .call(d3.axisLeft(yAxis)
+        .call(d3.axisLeft(lineChart.yAxis)
             .ticks(12)
             .tickFormat(function (d) {
                 return d === 0 ? "" : "£" + d3.format(".2s")(d);
@@ -150,21 +146,21 @@ function createVisualisation() {
 
     //Initialise visualisation to dummy data, for initial animation
     let initialData = incomes.map(function (income, i) {
-        return {year: years[i], income: maxIncome[mode]/2}
+        return {year: lineChart.years[i], income: lineChart.maxIncome[mode]/2}
     });
 
     //Append vertical grid lines
-    visualisation
+    lineChart.visualisation
     .append("g")
         .attr("class", "grid")
-        .attr("transform", "translate(0," + height + ")")
+        .attr("transform", "translate(0," + lineChart.height + ")")
         .call(verticalGridlines()
-            .tickSize(-height)
+            .tickSize(-lineChart.height)
             .tickFormat("")
         );
 
     // Define gradient object to be used later
-    let gradient = visualisation.append("defs")
+    let gradient = lineChart.visualisation.append("defs")
         .append("linearGradient")
         .attr("id","gradient")
         .attr("x1", "0%").attr("y1", "0%")
@@ -181,38 +177,38 @@ function createVisualisation() {
         .attr("stop-opacity", 0);
 
     // Compute and append area. Use gradient created above as fill
-    visualisation.append("path")
+    lineChart.visualisation.append("path")
         .attr("id", "gradient-area")
         .datum(initialData)
         .style("fill", "url(#gradient)")
         .attr("d", d3.area()
-            .x(function(d) { return xAxis(d.year) })
-            .y0(yAxis(0))
-            .y1(function(d) { return yAxis(d.income) })
+            .x(function(d) { return lineChart.xAxis(d.year) })
+            .y0(lineChart.yAxis(0))
+            .y1(function(d) { return lineChart.yAxis(d.income) })
         );
 
     //Append line showing the trend
-    visualisation
+    lineChart.visualisation
         .append('g')
         .append("path")
         .datum(initialData)
         .attr("d", d3.line()
-            .x(function(d) { return xAxis(d.year) })
-            .y(function(d) { return yAxis(d.income) })
+            .x(function(d) { return lineChart.xAxis(d.year) })
+            .y(function(d) { return lineChart.yAxis(d.income) })
             .curve(d3.curveMonotoneX)
         )
         .attr("id", "income-line");
 
     //Append dots in correspondence of data points
-    visualisation
+    lineChart.visualisation
         .append("g")
         .selectAll("dot")
         .data(initialData)
         .enter()
         .append("circle")
         .attr("class", "dot")
-        .attr("cx", function(d) { return xAxis(d.year) } )
-        .attr("cy", function(d) { return yAxis(d.income) } )
+        .attr("cx", function(d) { return lineChart.xAxis(d.year) } )
+        .attr("cy", function(d) { return lineChart.yAxis(d.income) } )
         .attr("r", 7)
         .attr("data-toggle", "tooltip")
         .attr("data-placement", "top")
@@ -229,22 +225,22 @@ function createVisualisation() {
 }
 
 // Update visualisation to show new data
-function updateVisualisation() {
+function updateLineChartVisualisation() {
 
-    let mode = selectedMode.toLocaleLowerCase();
-    let incomes = selectedBorough[mode];
-    updatingVisualisation = true;
+    let mode = lineChart.selectedMode.toLocaleLowerCase();
+    let incomes = lineChart.selectedBorough[mode];
+    lineChart.updatingVisualisation = true;
 
     // Update y axis values if a new mode was selected
-    yAxis = d3.scaleLinear()
-        .domain([0, maxIncome[mode]])
-        .range([height, 0]);
+    lineChart.yAxis = d3.scaleLinear()
+        .domain([0, lineChart.maxIncome[mode]])
+        .range([lineChart.height, 0]);
 
-    visualisation.select("#y-axis")
+    lineChart.visualisation.select("#y-axis")
         .transition()
         .ease(d3.easeExpOut)
         .duration(1000)
-        .call(d3.axisLeft(yAxis)
+        .call(d3.axisLeft(lineChart.yAxis)
             .ticks(12)
             .tickFormat(function (d) {
                 // Include £ prefix and avoid showing £0 value
@@ -253,7 +249,7 @@ function updateVisualisation() {
 
     // Map new incomes array to the years
     var data = incomes.map(function (income, i) {
-        return {year: years[i], income: income}
+        return {year: lineChart.years[i], income: income}
     });
 
     // Update income line
@@ -263,8 +259,8 @@ function updateVisualisation() {
         .ease(d3.easeExpOut)
         .duration(1000)
         .attr("d", d3.line()
-            .x(function(d) { return xAxis(d.year) })
-            .y(function(d) { return yAxis(d.income) })
+            .x(function(d) { return lineChart.xAxis(d.year) })
+            .y(function(d) { return lineChart.yAxis(d.income) })
             .curve(d3.curveMonotoneX)
         );
 
@@ -274,8 +270,8 @@ function updateVisualisation() {
         .transition()
         .ease(d3.easeExpOut)
         .duration(1000)
-        .attr("cx", function(d) { return xAxis(d.year) } )
-        .attr("cy", function(d) { return yAxis(d.income) } );
+        .attr("cx", function(d) { return lineChart.xAxis(d.year) } )
+        .attr("cy", function(d) { return lineChart.yAxis(d.income) } );
 
     // Update tooltip title outside of transition!
     d3.selectAll(".dot")
@@ -288,28 +284,28 @@ function updateVisualisation() {
         .ease(d3.easeExpOut)
         .duration(1000)
         .attr("d", d3.area()
-            .x(function(d) { return xAxis(d.year) })
-            .y0(yAxis(0))
-            .y1(function(d) { return yAxis(d.income) })
+            .x(function(d) { return lineChart.xAxis(d.year) })
+            .y0(lineChart.yAxis(0))
+            .y1(function(d) { return lineChart.yAxis(d.income) })
             .curve(d3.curveMonotoneX)
         )
         .on("end", function () {
-            updatingVisualisation = false;
+            lineChart.updatingVisualisation = false;
         });
 
 }
 
 // Create vertical grid lines
 function verticalGridlines() {
-    return d3.axisBottom(xAxis)
-        .ticks(years.length)
+    return d3.axisBottom(lineChart.xAxis)
+        .ticks(lineChart.years.length)
 }
 
 // Mouse entered the data point area
 function mouseOverDataPoint(data, dataPoint) {
 
     // Apply transition if previous transition has finished
-    if (!updatingVisualisation) {
+    if (!lineChart.updatingVisualisation) {
         dataPoint
             .transition()
             .ease(d3.easeElastic)
@@ -323,7 +319,7 @@ function mouseOverDataPoint(data, dataPoint) {
 // Mouse pointer left the data point area
 function mouseOutDataPoint(dataPoint) {
 
-    if (!updatingVisualisation) {
+    if (!lineChart.updatingVisualisation) {
         dataPoint
             .transition()
             .ease(d3.easeElastic)
