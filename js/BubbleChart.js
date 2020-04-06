@@ -46,11 +46,14 @@ Promise.all([
             let numberOfPeople = parseInt(numberOfIndividualsData[i][year].replace(",",""));
             let meanHappiness = parseFloat(meanHappinessData[i][year]);
 
-            numberOfPeopleValues.push(numberOfPeople);
+            let numberOfPeopleObj = {};
+            numberOfPeopleObj[year] = numberOfPeople;
+            numberOfPeopleValues.push(numberOfPeopleObj);
             bubbleChart.maxNumberOfPeople = Math.max(bubbleChart.maxNumberOfPeople, numberOfPeople);
 
-            meanHappinessValues.push(meanHappiness);
-
+            let meanHappinessObj = {};
+            meanHappinessObj[year] = meanHappiness;
+            meanHappinessValues.push(meanHappinessObj);
             if (!isNaN(meanHappiness)) {
                 bubbleChart.maxHappiness = Math.max(bubbleChart.maxHappiness, meanHappiness);
                 bubbleChart.minHappiness = Math.min(bubbleChart.minHappiness, meanHappiness);
@@ -125,28 +128,31 @@ function updateBubbleChartVisualisation() {
 
 function getDataForSelectedYear() {
 
-    let mode = "mean";
-    let yearIndex = bubbleChart.years.indexOf(bubbleChart.selectedYear);
-
     let data = [];
 
     for (const borough of common.boroughs) {
 
         let filteredBorough = {
             name: borough.name,
-            income: borough.mean[yearIndex],
-            happiness: borough.meanHappiness[yearIndex],
-            numberOfPeople: borough.numberOfPeople[yearIndex]
+            income: valueForSelectedYear(borough.mean),
+            happiness: valueForSelectedYear(borough.meanHappiness),
+            numberOfPeople: valueForSelectedYear(borough.numberOfPeople),
         };
-
         data.push(filteredBorough);
-
     }
 
     return data;
 
 }
 
+function valueForSelectedYear(objects) {
+    let obj = objects.filter(keyIsSelectedYear).pop();
+    return obj[bubbleChart.selectedYear];
+}
+
+function keyIsSelectedYear(obj) {
+    return Object.keys(obj)[0] === bubbleChart.selectedYear;
+}
 
 
 

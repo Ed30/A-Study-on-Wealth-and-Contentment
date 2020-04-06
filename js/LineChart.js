@@ -42,13 +42,18 @@ Promise.all([
             let meanIncome = parseInt(meanIncomeData[i][year].replace(",",""));
             let medianIncome = parseInt(medianIncomeData[i][year].replace(",",""));
 
-            meanIncomes.push(meanIncome);
+            let meanIncomeObj = {};
+            meanIncomeObj[year] = meanIncome;
+            meanIncomes.push(meanIncomeObj);
             common.maxIncome.mean = Math.max(common.maxIncome.mean, meanIncome);
 
-            medianIncomes.push(medianIncome);
+            let medianIncomeObj = {};
+            medianIncomeObj[year] = medianIncome;
+            medianIncomes.push(medianIncomeObj);
             common.maxIncome.median = Math.max(common.maxIncome.median, medianIncome);
 
         }
+
         let borough = {name: meanIncomeData[i].Area, mean: meanIncomes, median: medianIncomes};
         common.boroughs.push(borough);
     }
@@ -244,7 +249,8 @@ function updateLineChartVisualisation() {
 
     // Map new incomes array to the years
     var data = incomes.map(function (income, i) {
-        return {year: lineChart.years[i], income: income}
+        let year = lineChart.years[i];
+        return {year: year, income: income[year]}
     });
 
     // Update income line
