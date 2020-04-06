@@ -81,7 +81,7 @@ function addBoroughsToLineChartDropdown() {
 // A new borough was selected
 function boroughSelected(boroughItem) {
     let boroughName = $(boroughItem).text();
-    d3.select("#boroughDropdownButton")
+    d3.select("#borough-dropdown-button")
         .text(boroughName);
 
     lineChart.selectedBorough = common.boroughs.filter(borough => {

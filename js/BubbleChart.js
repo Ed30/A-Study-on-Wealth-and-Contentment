@@ -56,9 +56,6 @@ Promise.all([
                 bubbleChart.minHappiness = Math.min(bubbleChart.minHappiness, meanHappiness);
             }
 
-
-
-
         }
 
         common.boroughs[i].numberOfPeople = numberOfPeopleValues;
@@ -66,9 +63,6 @@ Promise.all([
 
     }
 
-    console.log(bubbleChart.minHappiness);
-    console.log(bubbleChart.maxHappiness);
-    console.log(bubbleChart.maxNumberOfPeople);
     addYearsToBubbleChartToolbar();
 
 });
@@ -112,11 +106,97 @@ function yearSelected(item) {
 }
 
 function createBubbleChartVisualisation() {
-
+    
+    let initialData = getDataForSelectedYear();
+    console.log(initialData);
+    
 
 
 }
 
 function updateBubbleChartVisualisation() {
-    console.log(bubbleChart.selectedYear);
+
+
+    let data = getDataForSelectedYear();
+    console.log(data);
+
 }
+
+
+function getDataForSelectedYear() {
+
+    let mode = "mean";
+    let yearIndex = bubbleChart.years.indexOf(bubbleChart.selectedYear);
+
+    let data = [];
+
+    for (const borough of common.boroughs) {
+
+        let filteredBorough = {
+            name: borough.name,
+            income: borough.mean[yearIndex],
+            happiness: borough.meanHappiness[yearIndex],
+            numberOfPeople: borough.numberOfPeople[yearIndex]
+        };
+
+        data.push(filteredBorough);
+
+    }
+
+    return data;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
