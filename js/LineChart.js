@@ -128,7 +128,7 @@ function createLineChartVisualisation() {
 
     //Append axes
     lineChart.visualisation.append("g")
-        .attr("id", "x-axis")
+        .attr("id", "x-axis-line")
         .attr("class", "axis")
         .attr("transform", "translate(0," + lineChart.height + ")")
         .call(d3.axisBottom(lineChart.xAxis)
@@ -136,7 +136,7 @@ function createLineChartVisualisation() {
             .tickFormat(d3.format("d")));
 
     lineChart.visualisation.append("g")
-        .attr("id", "y-axis")
+        .attr("id", "y-axis-line")
         .attr("class", "axis")
         .call(d3.axisLeft(lineChart.yAxis)
             .ticks(12)
@@ -202,7 +202,7 @@ function createLineChartVisualisation() {
     //Append dots in correspondence of data points
     lineChart.visualisation
         .append("g")
-        .selectAll("dot")
+        .selectAll(".dot")
         .data(initialData)
         .enter()
         .append("circle")
@@ -236,7 +236,7 @@ function updateLineChartVisualisation() {
         .domain([0, common.maxIncome[mode]])
         .range([lineChart.height, 0]);
 
-    lineChart.visualisation.select("#y-axis")
+    lineChart.visualisation.select("#y-axis-line")
         .transition()
         .ease(d3.easeExpOut)
         .duration(1000)

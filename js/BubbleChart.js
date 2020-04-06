@@ -12,6 +12,7 @@ let bubbleChart = {
     margins : { top: 10, right: 10, bottom: 30, left: 38 },
     height : 0,
     width : 0,
+    maxBubbleRadius : 60,
     xAxis : null,
     yAxis : null,
 
@@ -27,7 +28,7 @@ Promise.all([
     d3.csv("js/data/number-of-individuals.csv"),
 ]).then(function(data) {
 
-    setupChartSpace(bubbleChart, "#income-happiness-visualisation", 400, 720);
+    setupChartSpace(bubbleChart, "#income-happiness-visualisation", 720, 720);
 
     let meanIncomeData = data[0];
     let meanHappinessData = data[1]; // Contains years 2012 through 2017 only
@@ -68,6 +69,8 @@ Promise.all([
 
     addYearsToBubbleChartToolbar();
 
+    createBubbleChartVisualisation();
+
 });
 
 function addYearsToBubbleChartToolbar() {
@@ -85,7 +88,7 @@ function addYearsToBubbleChartToolbar() {
                 return "’" + bubbleChart.years[i].slice(-2);
             })
     }
-    updateBubbleChartVisualisation();
+    //updateBubbleChartVisualisation();
 }
 
 // Selected a new year
@@ -109,11 +112,58 @@ function yearSelected(item) {
 }
 
 function createBubbleChartVisualisation() {
-    
-    let initialData = getDataForSelectedYear();
-    console.log(initialData);
-    
 
+    //Create (x, y) axes
+    bubbleChart.xAxis = d3.scaleLinear()
+        .domain([0, common.maxIncome.mean + 20000])
+        .range([0, bubbleChart.width]);
+
+    bubbleChart.yAxis = d3.scaleLinear()
+        .domain([bubbleChart.minHappiness - 0.1, bubbleChart.maxHappiness + 0.1])
+        .range([bubbleChart.height, 0]);
+
+    //Append axes
+    bubbleChart.visualisation.append("g")
+        .attr("id", "x-axis-bubble")
+        .attr("class", "axis")
+        .attr("transform", "translate(0," + bubbleChart.height + ")")
+        .call(d3.axisBottom(bubbleChart.xAxis)
+            .ticks(12)
+            .tickFormat(function (d) {
+                return d === 0 ? "" : "£" + d3.format(".2s")(d);
+            }));
+
+    bubbleChart.visualisation.append("g")
+        .attr("id", "y-axis-bubble")
+        .attr("class", "axis")
+        .call(d3.axisLeft(bubbleChart.yAxis));
+
+    let initialData = getDataForSelectedYear();
+    initialData.splice(0, 1);
+    initialData.sort((obj1, obj2) => (obj1.numberOfPeople < obj2.numberOfPeople) ? 1 : -1)
+
+    console.log(initialData);
+
+    //Append dots in correspondence of data points
+    bubbleChart.visualisation
+        .append("g")
+        .selectAll(".bubble")
+        .data(initialData)
+        .enter()
+        .append("circle")
+        .attr("class", "bubble")
+        .attr("cx", function(d) { return bubbleChart.xAxis(d.income) } )
+        .attr("cy", function(d) { return bubbleChart.yAxis(d.happiness) } )
+        .attr("r", radiusForPopulation);
+        // .attr("data-toggle", "tooltip")
+        // .attr("data-placement", "top")
+        // .attr("data-original-title", function (d) { return d.income })
+        // .on("mouseover", function (d) {
+        //     mouseOverDataPoint(d, d3.select(this))
+        // })
+        // .on("mouseout", function () {
+        //     mouseOutDataPoint(d3.select(this))
+        // });
 
 }
 
@@ -121,7 +171,29 @@ function updateBubbleChartVisualisation() {
 
 
     let data = getDataForSelectedYear();
-    console.log(data);
+    data.splice(0, 1);
+    data.sort((obj1, obj2) => (obj1.numberOfPeople < obj2.numberOfPeople) ? 1 : -1)
+
+
+    //Update bubble positions
+    d3.selectAll(".bubble")
+        .data(data)
+        .transition()
+        .ease(d3.easeElasticInOut.amplitude(1.20).period(1.05))
+        .duration(1000)
+        .attr("cx", function(d) { return bubbleChart.xAxis(d.income) } )
+        .attr("cy", function(d) { return bubbleChart.yAxis(d.happiness) } )
+        .attr("r", radiusForPopulation);
+
+}
+
+function radiusForPopulation(d) {
+    // let maxArea = Math.pow(bubbleChart.maxBubbleRadius, 2) * Math.PI;
+    // let area = (maxArea * d.numberOfPeople)/bubbleChart.maxNumberOfPeople;
+    // let radius = Math.sqrt(area/Math.PI);
+    // return radius;
+
+    return (bubbleChart.maxBubbleRadius * d.numberOfPeople) / bubbleChart.maxNumberOfPeople;
 
 }
 

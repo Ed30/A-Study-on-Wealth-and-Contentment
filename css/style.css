@@ -40,7 +40,12 @@ body {
     fill: var(--highlight-blue);
     stroke: var(--bg-light);
     stroke-width: 3;
+}
 
+.bubble {
+    fill: var(--highlight-purple);
+    stroke: black;
+    stroke-width: 3;
 }
 
 .axis {
