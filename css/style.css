@@ -36,6 +36,13 @@ body {
     fill: none;
 }
 
+#regression-line {
+    stroke: #f44336;
+    stroke-width: 5;
+    stroke-linecap: round;
+    fill: none;
+}
+
 .dot {
     fill: var(--highlight-blue);
     stroke: var(--bg-light);

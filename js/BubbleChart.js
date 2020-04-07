@@ -22,6 +22,8 @@ let bubbleChart = {
     yAxis : null,
 
     bubbles : null,
+    regressionLine : null,
+    regressionLineVisible : true,
 
     visualisation : null,
     updatingVisualisation : false,
@@ -80,8 +82,8 @@ Promise.all([
 
     console.log(common.boroughs);
     addYearsToBubbleChartToolbar();
-
     createBubbleChartVisualisation();
+    setupRegressionButton();
 
 });
 
@@ -98,7 +100,7 @@ function addYearsToBubbleChartToolbar() {
             .attr("onclick", 'yearSelected(this)')
             .attr("data-toggle", "tooltip")
             .attr("data-placement", "top")
-            .attr("data-original-title", function () { return bubbleChart.years[i] })
+            .attr("data-original-title", function () { return bubbleChart.years[i]; })
             .text(function () { return "’" + bubbleChart.years[i].slice(-2); });
     }
     //updateBubbleChartVisualisation();
@@ -121,6 +123,22 @@ function yearSelected(item) {
         updateBubbleChartVisualisation();
     }
 
+
+}
+
+function setupRegressionButton() {
+    d3.select("#regression-button")
+        .attr("onclick", "regressionButtonClicked()")
+}
+
+function regressionButtonClicked() {
+    bubbleChart.regressionLineVisible = !bubbleChart.regressionLineVisible;
+
+    d3.select("#regression-line")
+        .transition(500)
+        .style("opacity", function () {
+            return bubbleChart.regressionLineVisible ? 1 : 0;
+        });
 
 }
 
@@ -167,7 +185,7 @@ function createBubbleChartVisualisation() {
         .attr("transform", "translate(1, 0)")
         .attr("height", bubbleChart.height);
 
-    d3.select("#home-button")
+    d3.select("#zoom-button")
         .on("click", resetZoom);
 
 
@@ -219,6 +237,34 @@ function createBubbleChartVisualisation() {
             mouseOutBubble(d3.select(this))
         });
 
+    console.log(initialData);
+
+    let linearRegression = ss.linearRegression(initialData.map(d => [
+        d.income,
+        d.happiness
+    ]));
+
+    linearRegressionLine = ss.linearRegressionLine(linearRegression);
+
+    var linearRegressionData = bubbleChart.xScale.domain().map(function(x) {
+        return {
+            income: x,
+            happiness: linearRegressionLine(+x)
+        };
+    });
+
+
+    bubbleChart.regressionLine = bubbleChart.visualisation
+        .append('g')
+        .append("path")
+        .datum(linearRegressionData)
+        .attr("d", d3.line()
+            .x(function(d) { return bubbleChart.xScale(d.income) })
+            .y(function(d) { return bubbleChart.yScale(d.happiness) })
+        )
+        .attr("id", "regression-line")
+        .attr("clip-path", "url(#mask)");
+
     $('[data-toggle="tooltip"]').tooltip();
 
 }
@@ -229,6 +275,14 @@ function bubbleChartZoomed() {
     bubbleChart.visualisation.select("#x-axis-bubble").call(bubbleChart.xAxis);
     bubbleChart.bubbles
         .attr("cx", function(d) { return bubbleChart.xScale(d.income); });
+
+    bubbleChart.regressionLine
+        .attr("d", d3.line()
+            .x(function(d) { return bubbleChart.xScale(d.income) })
+            .y(function(d) { return bubbleChart.yScale(d.happiness) })
+        );
+
+
 }
 
 function resetZoom() {
@@ -271,6 +325,30 @@ function updateBubbleChartVisualisation() {
         .attr("cx", function(d) { return bubbleChart.xScale(d.income) } )
         .attr("cy", function(d) { return bubbleChart.yScale(d.happiness) } )
         .attr("r", radiusForPopulation);
+
+    let linearRegression = ss.linearRegression(data.map(d => [
+        d.income,
+        d.happiness
+    ]));
+
+    linearRegressionLine = ss.linearRegressionLine(linearRegression);
+
+    var linearRegressionData = bubbleChart.xScale.domain().map(function(x) {
+        return {
+            income: x,
+            happiness: linearRegressionLine(+x)
+        };
+    });
+
+    bubbleChart.regressionLine
+        .datum(linearRegressionData)
+        .transition()
+        .ease(d3.easeExpOut)
+        .duration(1000)
+        .attr("d", d3.line()
+            .x(function(d) { return bubbleChart.xScale(d.income) })
+            .y(function(d) { return bubbleChart.yScale(d.happiness) })
+        );
 
 }
 
