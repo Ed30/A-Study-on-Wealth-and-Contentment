@@ -93,6 +93,14 @@ body {
     color: var(--text-dark);
 }
 
+.bold {
+    font-weight: bold;
+}
+
+.indent {
+    text-indent: 10px;
+}
+
 .light-background {
     background-color: var(--bg-light);
 }

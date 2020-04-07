@@ -32,25 +32,57 @@
 
 
                 <div class="card rounded-lg shadow panel light-background m-3">
-                    <div class="card-body">
+                    <div class="card-body text-justify">
 
-                        <h4 class="card-title white-text">A Study on Wealth and Contentment</h4>
-                        <h5 class="card-subtitle mb-2 light-text ">Introduction</h5>
+                        <h2 class="card-title white-text">A Study on Wealth and Contentment</h2>
+                        <h5 class="card-subtitle mb-3 mt-3 dark-text">INTRODUCTION</h5>
 
-                        <p class="card-text light-text">
-                            The following is a relatively small, local study on the relationaship between
-                            income and happiness. The analysis proposed here takes into consideration London boroughs only,
-                            showing the relation between income and general levels of happiness of people living in each borough.
+                        <p class="text-light">
+                            The following is a relatively small, local study on the general relationaship between
+                            income and happiness. The analysis proposed here takes into consideration
+                            <a target = "_blank" class = "text-light" href = "https://en.wikipedia.org/wiki/London_boroughs#List_of_boroughs">
+                                <u>London boroughs</u>
+                            </a> only, focusing on a number of metrics such as mean and median incomes,
+                            as well as average happiness indices for each borough. The data used here was extracted from
+                            datasets kindly provided by the <b>HM Revenue & Customs</b>, and the <b>Office for National Statistics (ONS)</b>, respectively.
+                            For more information, please head over to the <a class = "text-light " href = "#acknowledgements-panel"><u>acknowledgements</u></a> section.
                         </p>
 
-                        <p class="card-text light-text">
-                            The Bubble Chart visualisation below takes data from two separate datasets, each representing one of
-                            the metrics, and displays the correlation between those, for each borough.
+                        <p class="text-light"> The following two visualisations were built for the study. </p>
+
+
+                        <h6 class="bold"><a class = "text-light" href = "#income-panel"><u>Income Variation by Borough</u>:</a></h6>
+                        <p class="text-light">
+                            This first tool consists of a line chart showing income variation throughout the years, for each
+                            borough in particular. Choose your desired borough from the dropdown menu on the left, and the
+                            chart will automatically refresh to display metrics for that borough. Moreover, options for mean
+                            and median incomes are available on the right. Note how, by changing these, the income scale
+                            updates as well, as median incomes are significantly smaller than the mean ones. Last but not
+                            least, by moving the mouse cursor over a particualr data point, a tooltip with the exact income
+                            value for the particular year is shown.
                         </p>
+
+                        <h6 class="bold"><a class = "text-light" href = "#income-happiness-panel"><u>Relationship Between Income and Happiness</u>:</a></h6>
+                        <p class="text-light">
+                            This second, more complex tool, is a bubble chart showing the relation between income and general
+                            levels of happiness of people living in each borough. The (mean) income data is shared with the
+                            first visualisation, while average happiness indices were extracted from the ONS dataset
+                            discussed above. As opposed to the first chart, here the selection is based on years, and all
+                            the boroughs are scattered on the canvas at once, for each year. Note how the bubble areas are
+                            proportional to the number of tax payers for the associated boroughs. As before, hovering the
+                            mouse pointer over each bubble is going to provide the exact metrics associated with it.
+                            Last but not least, an optional regression line clarifies the overall trend of the relation.
+                        </p>
+
+                        <p class="text-light">
+                            Unfortunately, the City of London (not officialy a borough anyways) was exluded from this latter
+                            chart, as data with regards to happiness levels was insufficient.
+                        </p>
+
                     </div>
                 </div>
 
-                <div class="card rounded-lg shadow panel light-background m-3">
+                <div class="card rounded-lg shadow panel light-background m-3" id="income-panel">
                     <h5 class="card-header light-text">Income Variation by Borough</h5>
                     <div class="card-body">
 
@@ -93,11 +125,27 @@
                 </div>
 
 
-
-
-
-
                 <div class="card rounded-lg shadow panel light-background m-3">
+                    <h5 class="card-header light-text">Analysis</h5>
+                    <div class="card-body text-justify">
+
+                        <p class="text-light">
+                            This first tool consists of a line chart showing income variation throughout the years, for each
+                            borough in particular. Choose your desired borough from the dropdown menu on the left, and the
+                            chart will automatically refresh to display metrics for that borough. Moreover, options for mean
+                            and median incomes are available on the right. Note how, by changing these, the income scale
+                            updates as well, as median incomes are significantly smaller than the mean ones. Last but not
+                            least, by moving the mouse cursor over a particualr data point, a tooltip with the exact income
+                            value for the particular year is shown.
+                        </p>
+
+
+                    </div>
+                </div>
+
+
+
+                <div class="card rounded-lg shadow panel light-background m-3" id="income-happiness-panel">
                     <h5 class="card-header light-text">Relationship Between Income and Happiness</h5>
                     <div class="card-body">
 
@@ -108,11 +156,6 @@
                                 <div class="col btn-toolbar" role="toolbar">
                                     <div class="btn-group shadow mr-2" id="years-toolbar" role="group">
                                         <!-- Year buttons computed dynamically with JavaScript. -->
-                                    </div>
-                                    <div class="btn-group shadow mr-2" role="group">
-                                        <button type="button" class="btn btn-outline-light">
-                                            <i class="fas fa-play"></i>
-                                        </button>
                                     </div>
                                 </div>
 
@@ -150,6 +193,62 @@
                     </div>
                 </div>
 
+
+                <div class="card rounded-lg shadow panel light-background m-3">
+                    <h5 class="card-header light-text">Analysis</h5>
+                    <div class="card-body text-justify">
+
+                        <p class="text-light">
+                            This first tool consists of a line chart showing income variation throughout the years, for each
+                            borough in particular. Choose your desired borough from the dropdown menu on the left, and the
+                            chart will automatically refresh to display metrics for that borough. Moreover, options for mean
+                            and median incomes are available on the right. Note how, by changing these, the income scale
+                            updates as well, as median incomes are significantly smaller than the mean ones. Last but not
+                            least, by moving the mouse cursor over a particualr data point, a tooltip with the exact income
+                            value for the particular year is shown.
+                        </p>
+
+
+                    </div>
+                </div>
+
+
+                <div class="card rounded-lg shadow panel light-background m-3">
+                    <h5 class="card-header light-text">Past Literature</h5>
+                    <div class="card-body text-justify">
+
+                        <p class="text-light">
+                            This first tool consists of a line chart showing income variation throughout the years, for each
+                            borough in particular. Choose your desired borough from the dropdown menu on the left, and the
+                            chart will automatically refresh to display metrics for that borough. Moreover, options for mean
+                            and median incomes are available on the right. Note how, by changing these, the income scale
+                            updates as well, as median incomes are significantly smaller than the mean ones. Last but not
+                            least, by moving the mouse cursor over a particualr data point, a tooltip with the exact income
+                            value for the particular year is shown.
+                        </p>
+
+
+                    </div>
+                </div>
+
+
+                <div class="card rounded-lg shadow panel light-background m-3" id = "acknowledgements-panel">
+                    <h5 class="card-header light-text">Acknowledgements</h5>
+                    <div class="card-body text-justify">
+
+                        <p class="text-light">
+                            This first tool consists of a line chart showing income variation throughout the years, for each
+                            borough in particular. Choose your desired borough from the dropdown menu on the left, and the
+                            chart will automatically refresh to display metrics for that borough. Moreover, options for mean
+                            and median incomes are available on the right. Note how, by changing these, the income scale
+                            updates as well, as median incomes are significantly smaller than the mean ones. Last but not
+                            least, by moving the mouse cursor over a particualr data point, a tooltip with the exact income
+                            value for the particular year is shown.
+                        </p>
+
+
+                    </div>
+                </div>
 
 
 
