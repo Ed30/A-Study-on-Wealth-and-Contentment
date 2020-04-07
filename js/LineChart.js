@@ -220,8 +220,6 @@ function createLineChartVisualisation() {
             mouseOutDataPoint(d3.select(this))
         });
 
-    $('[data-toggle="tooltip"]').tooltip();
-
 }
 
 // Update visualisation to show new data

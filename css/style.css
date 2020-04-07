@@ -93,9 +93,3 @@ body {
 .dark-background {
     background-color: var(--bg-dark);
 }
-
-#drop-shadow {
-    -webkit-box-shadow: 0px 0px 48px -16px rgba(0,0,0,0.75);
-    -moz-box-shadow: 0px 0px 48px -16px rgba(0,0,0,0.75);
-    box-shadow: 0px 0px 48px -16px rgba(0,0,0,0.75);
-}

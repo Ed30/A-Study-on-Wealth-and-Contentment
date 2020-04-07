@@ -96,9 +96,10 @@ function addYearsToBubbleChartToolbar() {
             .attr("name", bubbleChart.years[i])
             .attr("class", "btn btn-outline-light" + (i === 0 ? " active" : ""))
             .attr("onclick", 'yearSelected(this)')
-            .text(function () {
-                return "’" + bubbleChart.years[i].slice(-2);
-            })
+            .attr("data-toggle", "tooltip")
+            .attr("data-placement", "top")
+            .attr("data-original-title", function () { return bubbleChart.years[i] })
+            .text(function () { return "’" + bubbleChart.years[i].slice(-2); });
     }
     //updateBubbleChartVisualisation();
 }
@@ -127,7 +128,7 @@ function createBubbleChartVisualisation() {
 
 
     bubbleChart.xScale = d3.scaleLinear()
-        .domain([0, common.maxIncome.mean + 20000])
+        .domain([0, common.maxIncome.mean + 10000])
         .range([0, bubbleChart.width]);
 
     bubbleChart.xScaleReference = bubbleChart.xScale.copy();
@@ -207,15 +208,18 @@ function createBubbleChartVisualisation() {
         .attr("cx", function(d) { return bubbleChart.xScale(d.income) } )
         .attr("cy", function(d) { return bubbleChart.yScale(d.happiness) } )
         .attr("r", radiusForPopulation)
-        // .attr("data-toggle", "tooltip")
-        // .attr("data-placement", "top")
-        // .attr("data-original-title", function (d) { return d.income })
+        .attr("data-toggle", "tooltip")
+        .attr("data-placement", "right")
+        .attr("data-html", true)
+        .attr("data-original-title", toolTipContents)
         .on("mouseover", function (d) {
             mouseOverBubble(d3.select(this))
         })
         .on("mouseout", function () {
             mouseOutBubble(d3.select(this))
         });
+
+    $('[data-toggle="tooltip"]').tooltip();
 
 }
 
@@ -230,9 +234,20 @@ function bubbleChartZoomed() {
 function resetZoom() {
     bubbleChart.visualisation
         .transition()
-        .duration(1500)
+        .duration(1000)
         .ease(d3.easeExpOut)
         .call( bubbleChart.zoom.transform, d3.zoomIdentity);
+}
+
+function toolTipContents(d) {
+
+    let nameRow = "<b>" + d.name + "</b><br>";
+    let peopleRow = "Tax Payers: " + d3.format(",.0f")(d.numberOfPeople) + "<br>";
+    let happinessRow = "Mean Happiness: " + d.happiness + "<br>";
+    let salaryRow = "Mean PCI: £" + d3.format(",.0f")(d.income) + "";
+
+    return nameRow + peopleRow + happinessRow + salaryRow;
+
 }
 
 function updateBubbleChartVisualisation() {
@@ -242,12 +257,16 @@ function updateBubbleChartVisualisation() {
     data.splice(0, 1);
     data.sort((obj1, obj2) => (obj1.numberOfPeople < obj2.numberOfPeople) ? 1 : -1)
 
+    bubbleChart.bubbles
+        .data(data)
+        .attr("data-original-title", toolTipContents);
+
 
     //Update bubble positions
     bubbleChart.bubbles
         .data(data)
         .transition()
-        .ease(d3.easeElasticInOut.amplitude(1.20).period(1.05))
+        .ease(d3.easeExpOut)
         .duration(1000)
         .attr("cx", function(d) { return bubbleChart.xScale(d.income) } )
         .attr("cy", function(d) { return bubbleChart.yScale(d.happiness) } )
