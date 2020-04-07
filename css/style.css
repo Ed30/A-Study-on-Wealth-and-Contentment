@@ -61,10 +61,12 @@ body {
 }
 
 .inner {
+    color: var(--highlight-yellow);
     fill: var(--highlight-yellow);
 }
 
 .outer {
+    color: var(--highlight-orange);
     fill: var(--highlight-orange);
 }
 
