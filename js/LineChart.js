@@ -3,7 +3,7 @@ let lineChart = {
 
     years : [],
     selectedBorough : null,
-    selectedMode : "Mean",
+    selectedMode : "mean",
 
     margins : { top: 10, right: 10, bottom: 30, left: 38 },
     height : 0,
@@ -114,7 +114,7 @@ function meanMedianSelected(item) {
 // Creates and initialise visualisation to initial dummy data
 function createLineChartVisualisation() {
 
-    let mode = lineChart.selectedMode.toLocaleLowerCase();
+    let mode = lineChart.selectedMode;
     let incomes = lineChart.selectedBorough[mode];
 
     //Create (x, y) axes
@@ -152,7 +152,7 @@ function createLineChartVisualisation() {
     //Append vertical grid lines
     lineChart.visualisation
     .append("g")
-        .attr("class", "grid")
+        .attr("class", "line-grid")
         .attr("transform", "translate(0," + lineChart.height + ")")
         .call(verticalGridlines()
             .tickSize(-lineChart.height)
@@ -214,7 +214,7 @@ function createLineChartVisualisation() {
         .attr("data-placement", "top")
         .attr("data-original-title", function (d) { return d.income })
         .on("mouseover", function (d) {
-            mouseOverDataPoint(d, d3.select(this))
+            mouseOverDataPoint(d3.select(this))
         })
         .on("mouseout", function () {
             mouseOutDataPoint(d3.select(this))
@@ -227,7 +227,7 @@ function createLineChartVisualisation() {
 // Update visualisation to show new data
 function updateLineChartVisualisation() {
 
-    let mode = lineChart.selectedMode.toLocaleLowerCase();
+    let mode = lineChart.selectedMode;
     let incomes = lineChart.selectedBorough[mode];
     lineChart.updatingVisualisation = true;
 
@@ -303,7 +303,7 @@ function verticalGridlines() {
 }
 
 // Mouse entered the data point area
-function mouseOverDataPoint(data, dataPoint) {
+function mouseOverDataPoint(dataPoint) {
 
     // Apply transition if previous transition has finished
     if (!lineChart.updatingVisualisation) {
