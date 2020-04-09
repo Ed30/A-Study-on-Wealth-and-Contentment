@@ -193,7 +193,7 @@ function createBubbleChartVisualisation() {
 
     legend.append("circle").attr("cx",225).attr("cy",35).attr("r", 6).attr("class", "inner");
     legend.append("circle").attr("cx",425).attr("cy",35).attr("r", 6).attr("class", "outer");
-    legend.append("text").attr("x", 265).attr("y", 36).text("Inner Boroughs").style("font-size", "15px").style("fill", "#F8F9FA").attr("alignment-baseline","middle");
+    legend.append("text").attr("x", 245).attr("y", 36).text("Inner Boroughs").style("font-size", "15px").style("fill", "#F8F9FA").attr("alignment-baseline","middle");
     legend.append("text").attr("x", 445).attr("y", 36).text("Outer Boroughs").style("font-size", "15px").style("fill", "#F8F9FA").attr("alignment-baseline","middle");
 
 
